@@ -25,14 +25,14 @@ type ProgressRow = {
 };
 
 type Props = {
-  params: { courseId: string };
+  params: { id: string };
   searchParams: { lessonId?: string };
 };
 
 export default async function LearnPage({ params, searchParams }: Props) {
   const user = await getSessionUser();
   if (!user) {
-    redirect("/auth?redirect=/courses/" + params.courseId + "/learn");
+    redirect("/auth?redirect=/courses/" + params.id + "/learn");
   }
 
   const supabase = createSupabaseServerClient();
@@ -41,11 +41,11 @@ export default async function LearnPage({ params, searchParams }: Props) {
     .from("enrollments")
     .select("id")
     .eq("user_id", user.id)
-    .eq("course_id", params.courseId)
+    .eq("course_id", params.id)
     .maybeSingle();
 
   if (!enrollment) {
-    redirect(`/courses/${params.courseId}`);
+    redirect(`/courses/${params.id}`);
   }
 
   const { data: sectionsRaw } = await supabase
@@ -58,7 +58,7 @@ export default async function LearnPage({ params, searchParams }: Props) {
       )
     `
     )
-    .eq("course_id", params.courseId);
+    .eq("course_id", params.id);
 
   const sections = ((sectionsRaw ?? []) as unknown as SectionRow[])
     .map((s) => ({
@@ -82,7 +82,7 @@ export default async function LearnPage({ params, searchParams }: Props) {
     .from("progress")
     .select("lesson_id, status")
     .eq("user_id", user.id)
-    .eq("course_id", params.courseId);
+    .eq("course_id", params.id);
 
   const progressMap = new Map(
     ((progressRows ?? []) as unknown as ProgressRow[]).map((p) => [
@@ -149,7 +149,7 @@ export default async function LearnPage({ params, searchParams }: Props) {
                 await supa.from("progress").upsert(
                   {
                     user_id: user.id,
-                    course_id: params.courseId,
+                    course_id: params.id,
                     lesson_id: activeLesson.id,
                     status: "completed"
                   },
@@ -157,10 +157,10 @@ export default async function LearnPage({ params, searchParams }: Props) {
                 );
                 if (nextLesson) {
                   redirect(
-                    `/courses/${params.courseId}/learn?lessonId=${nextLesson.id}`
+                    `/courses/${params.id}/learn?lessonId=${nextLesson.id}`
                   );
                 } else {
-                  redirect(`/courses/${params.courseId}/learn`);
+                  redirect(`/courses/${params.id}/learn`);
                 }
               }}
             >
@@ -187,7 +187,7 @@ export default async function LearnPage({ params, searchParams }: Props) {
         <div className="flex gap-2">
           {prevLesson && (
             <a
-              href={`/courses/${params.courseId}/learn?lessonId=${prevLesson.id}`}
+              href={`/courses/${params.id}/learn?lessonId=${prevLesson.id}`}
               className="rounded-full border border-white/20 bg-white/5 px-4 py-1.5 text-white/80 hover:bg-white/10"
             >
               ← Previous lesson
@@ -197,7 +197,7 @@ export default async function LearnPage({ params, searchParams }: Props) {
         <div className="flex gap-2">
           {nextLesson && (
             <a
-              href={`/courses/${params.courseId}/learn?lessonId=${nextLesson.id}`}
+              href={`/courses/${params.id}/learn?lessonId=${nextLesson.id}`}
               className="rounded-full bg-indigo-500/80 px-4 py-1.5 text-white shadow-glow hover:bg-indigo-500"
             >
               Next lesson →
@@ -208,4 +208,3 @@ export default async function LearnPage({ params, searchParams }: Props) {
     </div>
   );
 }
-

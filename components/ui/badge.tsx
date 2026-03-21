@@ -11,11 +11,11 @@ export const Badge = React.forwardRef<HTMLDivElement, BadgeProps>(
     <div
       ref={ref}
       className={cn(
-        "inline-flex items-center rounded-full border px-2.5 py-1 text-[0.7rem] font-medium",
+        "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
         variant === "default" &&
-          "border-transparent bg-indigo-500/30 text-indigo-50",
+          "border-transparent bg-primary/20 text-primary-foreground backdrop-blur-md shadow-sm",
         variant === "outline" &&
-          "border-indigo-400/50 bg-indigo-500/10 text-indigo-50",
+          "border-white/20 bg-white/5 text-foreground backdrop-blur-md",
         className
       )}
       {...props}
